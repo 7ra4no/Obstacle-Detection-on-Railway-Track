@@ -17,11 +17,12 @@ def start_write_movie():
 # 書き込み処理終了
 def end_write_movie(video):
     video.release()
-    return
 
 # フレーム間差分の背景画像処理（初期）
 def interframe_mask(movie_file):
     s, f = movie_file.read()
+    if f is None:
+        return
     b = cv2.resize(f, (600, 400))
     b = cv2.cvtColor(b, cv2.COLOR_BGR2GRAY)
     bg = b.copy()
