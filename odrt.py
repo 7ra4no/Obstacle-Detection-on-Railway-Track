@@ -11,7 +11,7 @@ def read_movie(path):
 # 映像書き込み
 def start_write_movie():
     codec = cv2.VideoWriter_fourcc(*'mp4v')
-    video = cv2.VideoWriter('testout.mp4', codec, 60, (1200, 800),0)
+    video = cv2.VideoWriter('out.mp4', codec, 60, (1200, 800),0)
     return video
 
 # 書き込み処理終了
@@ -19,6 +19,7 @@ def end_write_movie(video):
     video.release()
 
 # フレーム間差分の背景画像処理（初期）
+# マスク処理のところをいじる必要あり．
 def interframe_mask(movie_file):
     s, f = movie_file.read()
     if f is None:
@@ -32,6 +33,7 @@ def interframe_mask(movie_file):
     return bg
 
 # フレーム間差分に用いるマスク画像
+# マスク処理のところをいじる必要あり．
 def interframe_mask_(gray_mask):
     gray_mask = cv2.rectangle(gray_mask, (0, 0), (600, 200), (0, 0, 0), -1)
     gray_mask = cv2.rectangle(gray_mask, (0, 0), (200, 400), (0, 0, 0), -1)
@@ -49,6 +51,7 @@ def frame_grayscale(frame):
     return gray_scale
 
 # フレーム間差分
+# マスク処理のところをいじる必要あり．
 def interframe_difference(bg,gray_mask,gray_blur):
     ### 障害物検出（フレーム間差分）閾値 ###
     th = 20
@@ -75,6 +78,7 @@ def canny_edge(gray_blur):
     return canny
 
 # マスク処理による余分なエッジを削除
+# ここのcanny.copy()下の値，Mイコール下の値をいじる必要あり．
 def delete_mask_edge(canny):
     ### マスクエッジをマスク処理で削除 ###
     frame1 = canny.copy()[220:400,270:400]
@@ -90,7 +94,7 @@ def bounding_rectangle(mask,gray_scale):
             mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
         )
     contours = list(filter(lambda x: cv2.contourArea(x) > 5000, contours))
-    ### 障害物と思しき輪郭に対して外接矩形を描画
+    ### 障害物と思しき輪郭に対して外接矩形を描画 ###
     if len(contours) != 0:
         rect = cv2.minAreaRect(contours[0])
         box = cv2.boxPoints(rect)
@@ -188,7 +192,7 @@ def play_movie(movie_file, frame_count):
             #video.write(mergeMovie2.astype(np.uint8))
             ### 動画表示（書き込み時にはコメントアウトすること） ###
             cv2.imshow("test", mergeMovie2)
-            key = cv2.waitKey(1)
+            key = cv2.waitKey(1) & 0xFF
             if key == 27: # Press Esc KEY to Exit
                 break
     ### メモリ解放 ###
@@ -199,7 +203,7 @@ def play_movie(movie_file, frame_count):
 
 def main():
     # 動画のパスをここで指定
-    filepath = 'jiko.mov'
+    filepath = 'hogehoge.mov'
     mov_data = read_movie(filepath)
     play_movie(*mov_data)
 
